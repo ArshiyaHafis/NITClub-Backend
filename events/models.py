@@ -70,69 +70,31 @@ class Club(models.Model):
     club_fa = models.CharField(max_length=200)
     club_admin = models.ForeignKey(customuser, on_delete=models.CASCADE, default="B210021CS")
     club_opening_balance = models.FloatField()
-    club_balance = models.FloatField()
+    club_balance = models.FloatField(default=0)
     club_logo = models.ImageField(upload_to='images/club_logo/', blank=True)
 
-    def update_balance(self):
-        total_event_budget = Event.objects.filter(event_club=self).aggregate(total_budget=models.Sum('event_budget'))['total_budget'] or 0
-        total_event_profit = Event.objects.filter(event_club=self).aggregate(total_profit=models.Sum('event_profit'))['total_profit'] or 0
-        self.club_balance = self.club_opening_balance - total_event_budget + total_event_profit
-        self.save()
-        
-    def save(self, *args, **kwargs):
-        super(Club, self).save(*args, **kwargs)
-        self.club_admin.update_admin()
 
 
 
 class Event(models.Model):
     event_id = CustomAutoField(primary_key=True)
     event_name = models.CharField(max_length=200)
-    event_date = models.DateField(default=datetime.today)
+    event_date = models.DateField()
     event_time = models.TimeField()
     event_venue = models.CharField(max_length=300)
     event_budget = models.FloatField(null=True)
     event_cost = models.FloatField(null=True)
     event_regfee = models.FloatField()
-    event_profit = models.FloatField(null=True)
-    event_club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    event_club = models.ForeignKey('Club', on_delete=models.CASCADE)
     event_image = models.ImageField(upload_to='images/event_images/', blank=True)
     event_students = models.IntegerField(default=0)
+    event_profit = models.FloatField(default=0)
 
-    def save(self, *args, **kwargs):
-        if not self.event_id:
-            last_id = Event.objects.all().order_by('-event_id').first()
-            if last_id:
-                last_id_value = int(last_id.event_id[1:])
-                new_id_value = last_id_value + 1
-                self.event_id = f'E{new_id_value:06}'
-            else:
-                self.event_id = 'E000001'
-        
-        self.event_profit = self.event_budget - self.event_cost
-        super(Event, self).save(*args, **kwargs)
-        self.event_club.update_balance()
+    def __str__(self):
+        return self.event_name
 
 
 class Registration(models.Model):
     reg_id = CustomAutoField(primary_key = True)
     student_id = models.ForeignKey(customuser, on_delete=models.CASCADE, default=1)
     event_id = models.ForeignKey(Event, on_delete=models.CASCADE)
-
-
-    def save(self, *args, **kwargs):
-        if not self.reg_id:
-            last_id = Registration.objects.all().order_by('-reg_id').first()
-            if last_id:
-                last_id_value = int(last_id.reg_id[1:])
-                new_id_value = last_id_value + 1
-                self.reg_id = f'R{new_id_value:06}'
-            else:
-                self.reg_id = 'R000001'
-
-        super(Registration, self).save(*args, **kwargs)
-
-        if self.event_id:
-            event = self.event_id
-            event.event_students = Registration.objects.filter(event_id=event).count()
-            event.save()

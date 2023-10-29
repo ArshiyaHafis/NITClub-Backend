@@ -5,8 +5,8 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import login
 
-from .models import customuser, Club
-from .serializers import CustomUserSerializer, UserLoginSerializer, ClubSerializer
+from .models import customuser, Club, Event, Registration
+from .serializers import CustomUserSerializer, UserLoginSerializer, ClubSerializer, EventSerializer, RegistrationSerializer
 
 class UserCreateView(generics.CreateAPIView):
     queryset = customuser.objects.all()
@@ -50,3 +50,31 @@ class ClubListCreateView(generics.ListCreateAPIView):
 class ClubDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Club.objects.all()
     serializer_class = ClubSerializer
+
+class EventListCreateView(generics.ListCreateAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    def perform_create(self, serializer):
+        club_id = self.request.data.get('event_club')
+        serializer.save(event_club=club_id)
+
+class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+class RegistrationListCreateView(generics.ListCreateAPIView):
+    queryset = Registration.objects.all()
+    serializer_class = RegistrationSerializer
+
+    def perform_create(self, serializer):
+        student_roll_number = self.request.data.get('student_id')
+        event_id = self.request.data.get('event_id')
+        
+        serializer.save(student_id=student_roll_number, event_id=event_id)
+
+class RegistrationDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Registration.objects.all()
+    serializer_class = RegistrationSerializer

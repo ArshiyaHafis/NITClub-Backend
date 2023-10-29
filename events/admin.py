@@ -15,3 +15,17 @@ admin.site.register(Registration)
 # new_user = customuser(first_name="Chandrakant", last_name="V Bellary", email="chandrakant_b210462cs@nitc.ac.in", phone_number="8137005243", roll_number="B210462CS", password = "chandu")
 # new_user = customuser(first_name="Allamaneni", last_name="Srikar", email="allamaneni_b210492cs@nitc.ac.in", phone_number="8328489716", roll_number="B210492CS", password = "Srikar")
 # new_club = Club(club_id="C456", club_name="Club2", club_fa="FA2", club_opening_balance=1500.0, club_balance=600.0, club_admin_id=new_user)
+# {
+#   "event_id": "E000001",
+#   "event_club": "C123",
+#   "event_name": "Sample Event",
+#   "event_date": "2023-10-30",
+#   "event_time": "15:00:00",
+#   "event_venue": "Sample Venue",
+#   "event_budget": 0.0,
+#   "event_cost": 0.0,
+#   "event_regfee": 20.0,
+#   "event_image": null,
+#   "event_students": 0,
+#   "event_profit": 0.0
+# }
