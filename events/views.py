@@ -27,7 +27,17 @@ class UserLoginView(APIView):
             user = serializer.validated_data['user']
             login(request, user)
             token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key})
+            user_data = {
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'phone_number': user.phone_number,
+                'roll_number': user.roll_number,
+                'is_active': user.is_active,
+                'isClubAdmin': user.isClubAdmin, 
+            }
+
+            return Response({'token': token.key, 'user': user_data})
         return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
