@@ -44,6 +44,15 @@ INSTALLED_APPS = [
     'events',
 ]
 
+REST_FRAMEWORK = {
+   'DEFAULT_AUTHENTICATION_CLASSES': (
+       'rest_framework.authentication.TokenAuthentication',
+   ),
+   'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAdminUser'
+   ),
+}
+
 AUTH_USER_MODEL = 'events.customuser'
 
 MIDDLEWARE = [
