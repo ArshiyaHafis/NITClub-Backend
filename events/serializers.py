@@ -37,7 +37,7 @@ class UserLoginSerializer(serializers.Serializer):
         return data
     
 class ClubSerializer(serializers.ModelSerializer):
-    club_admin = serializers.CharField(write_only=True, required=True)
+    club_admin = serializers.CharField(required=True)
 
     class Meta:
         model = Club
@@ -46,6 +46,8 @@ class ClubSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         club_admin = validated_data.pop('club_admin')
         user = customuser.objects.get(roll_number=club_admin)
+        user.isClubAdmin=True
+        user.save()
         validated_data['club_balance'] = validated_data['club_opening_balance']
         club = Club.objects.create(club_admin=user, **validated_data)
         club.save()

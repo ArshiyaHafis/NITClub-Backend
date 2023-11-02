@@ -40,6 +40,7 @@ class UserLoginView(APIView):
             return Response({'token': token.key, 'user': user_data})
         return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
+
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = customuser.objects.all()
     serializer_class = CustomUserSerializer
@@ -48,9 +49,28 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         return self.request.user
 
+    def retrieve(self, request, *args, **kwargs):
+        user = self.get_object()
+
+        if user.isClubAdmin:
+            clubs = Club.objects.filter(club_admin=user)
+            club_serializer = ClubSerializer(clubs, many=True)
+
+            # Serialize the user and clubs
+            user_serializer = self.get_serializer(user)
+            data = user_serializer.data
+            data['clubs'] = club_serializer.data
+
+            return Response(data)
+        else:
+            # User is not a club admin, just return the user details
+            return super().retrieve(request, *args, **kwargs)
+
+
 class ClubListCreateView(generics.ListCreateAPIView):
     queryset = Club.objects.all()
     serializer_class = ClubSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         roll_number = self.request.data.get('club_admin')  # Use 'club_admin' from the request data
@@ -60,11 +80,12 @@ class ClubListCreateView(generics.ListCreateAPIView):
 class ClubDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Club.objects.all()
     serializer_class = ClubSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 class EventListCreateView(generics.ListCreateAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     def perform_create(self, serializer):
         club_id = self.request.data.get('event_club')
         serializer.save(event_club=club_id)
@@ -72,12 +93,13 @@ class EventListCreateView(generics.ListCreateAPIView):
 class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class RegistrationListCreateView(generics.ListCreateAPIView):
     queryset = Registration.objects.all()
     serializer_class = RegistrationSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         student_roll_number = self.request.data.get('student_id')
@@ -88,3 +110,4 @@ class RegistrationListCreateView(generics.ListCreateAPIView):
 class RegistrationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Registration.objects.all()
     serializer_class = RegistrationSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]

@@ -57,7 +57,7 @@ class customuser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['first_name', 'last_name', 'phone_number', 'roll_number']
 
     def __str__(self):
-        return self.email
+        return self.roll_number
     
     def update_admin(self):
         self.isClubAdmin=True
