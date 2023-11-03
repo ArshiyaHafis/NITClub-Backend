@@ -57,7 +57,7 @@ class ClubSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     event_club = serializers.PrimaryKeyRelatedField(queryset=Club.objects.all())
-    event_id = serializers.CharField(read_only=True)  # Make event_id read-only
+    event_id = serializers.CharField(read_only=True)  
 
     class Meta:
         model = Event
@@ -142,4 +142,3 @@ class RegistrationSerializer(serializers.ModelSerializer):
         event.save()
 
         return registration
-

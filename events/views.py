@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import login
+from datetime import datetime
 
 from .models import customuser, Club, Event, Registration
 from .serializers import CustomUserSerializer, UserLoginSerializer, ClubSerializer, EventSerializer, RegistrationSerializer
@@ -55,15 +56,14 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
         if user.isClubAdmin:
             clubs = Club.objects.filter(club_admin=user)
             club_serializer = ClubSerializer(clubs, many=True)
-
-            # Serialize the user and clubs
+            
             user_serializer = self.get_serializer(user)
             data = user_serializer.data
             data['clubs'] = club_serializer.data
 
             return Response(data)
         else:
-            # User is not a club admin, just return the user details
+            
             return super().retrieve(request, *args, **kwargs)
 
 
@@ -73,8 +73,8 @@ class ClubListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        roll_number = self.request.data.get('club_admin')  # Use 'club_admin' from the request data
-        serializer.save(club_admin=roll_number)  # Update 'club_admin' with the roll_number
+        roll_number = self.request.data.get('club_admin')  
+        serializer.save(club_admin=roll_number)  
 
 
 class ClubDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -111,3 +111,24 @@ class RegistrationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Registration.objects.all()
     serializer_class = RegistrationSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+class RegisteredEventsView(generics.ListAPIView):
+    serializer_class = EventSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        user = self.request.user  
+        registrations = Registration.objects.filter(student_id=user)
+        registered_event_ids = [registration.event_id.event_id for registration in registrations]
+        return Event.objects.filter(event_id__in=registered_event_ids)
+
+class UpcomingEventsList(generics.ListAPIView):
+    serializer_class = EventSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        current_datetime = datetime.now()
+        return Event.objects.filter(event_date__gte=current_datetime.date()).exclude(
+            event_date=current_datetime.date(),
+            event_time__lt=current_datetime.time()
+        ).order_by('event_date', 'event_time')

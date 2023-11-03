@@ -1,5 +1,6 @@
 from django.urls import path, include
-from .views import UserCreateView, UserLoginView, UserDetailView, ClubListCreateView, ClubDetailView, EventListCreateView, EventDetailView, RegistrationListCreateView, RegistrationDetailView
+from .views import UserCreateView, UserLoginView, UserDetailView, ClubListCreateView, ClubDetailView, EventListCreateView, EventDetailView, RegistrationListCreateView, RegistrationDetailView, RegisteredEventsView,UpcomingEventsList
+
 
 urlpatterns = [
     path('register/', UserCreateView.as_view(), name='user-register'),
@@ -11,4 +12,6 @@ urlpatterns = [
     path('events/<str:pk>/', EventDetailView.as_view(), name='event-detail'),
     path('registrations/', RegistrationListCreateView.as_view(), name='registration-list-create'),
     path('registrations/<str:pk>/', RegistrationDetailView.as_view(), name='registration-detail'),
+    path('registered-events/', RegisteredEventsView.as_view(), name='registered-events'),
+    path('upcoming-events/', UpcomingEventsList.as_view(), name='upcoming-events'),
 ]

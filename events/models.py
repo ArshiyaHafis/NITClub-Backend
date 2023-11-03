@@ -18,7 +18,7 @@ class CustomUserManager(BaseUserManager):
 
         email = self.normalize_email(email)
         print("hehe")
-        password = make_password(password)  # Hash the password
+        password = make_password(password)  
         user = self.model(first_name=first_name, last_name=last_name, email=email, phone_number=phone_number, roll_number=roll_number, **extra_fields)
         user.password = password
         user.save(using=self._db)
@@ -49,7 +49,7 @@ class customuser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=datetime.today)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    isClubAdmin = models.BooleanField(default=False)  # Add isClubAdmin field
+    isClubAdmin = models.BooleanField(default=False)  
     
     objects = CustomUserManager()
 
