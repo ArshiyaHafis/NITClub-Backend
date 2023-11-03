@@ -99,5 +99,3 @@ class Registration(models.Model):
     student_id = models.ForeignKey(customuser, on_delete=models.CASCADE, default=1)
     event_id = models.ForeignKey(Event, on_delete=models.CASCADE)
 
-    class Meta:
-        unique_together = ['student_id', 'event_id']

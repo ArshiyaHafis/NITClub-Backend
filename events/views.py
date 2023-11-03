@@ -104,8 +104,10 @@ class RegistrationListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         student_roll_number = self.request.data.get('student_id')
         event_id = self.request.data.get('event_id')
-        
-        serializer.save(student_id=student_roll_number, event_id=event_id)
+        if Registration.objects.filter(student_id=student_roll_number, event_id=event_id).exists():
+            return Response({"detail": "This registration already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer.save(student_id=student_roll_number, event_id=event_id)
 
 class RegistrationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Registration.objects.all()
