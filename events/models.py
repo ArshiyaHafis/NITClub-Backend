@@ -82,8 +82,8 @@ class Event(models.Model):
     event_date = models.DateField()
     event_time = models.TimeField()
     event_venue = models.CharField(max_length=300)
-    event_budget = models.FloatField(null=True)
-    event_cost = models.FloatField(null=True)
+    event_budget = models.FloatField(null=True,default=0)
+    event_cost = models.FloatField(null=True, default=0)
     event_regfee = models.FloatField()
     event_club = models.ForeignKey('Club', on_delete=models.CASCADE)
     event_image = models.ImageField(upload_to='images/event_images/', blank=True)
@@ -95,6 +95,9 @@ class Event(models.Model):
 
 
 class Registration(models.Model):
-    reg_id = CustomAutoField(primary_key = True)
+    reg_id = CustomAutoField(primary_key=True)
     student_id = models.ForeignKey(customuser, on_delete=models.CASCADE, default=1)
     event_id = models.ForeignKey(Event, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ['student_id', 'event_id']

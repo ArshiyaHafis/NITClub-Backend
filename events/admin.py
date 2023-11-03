@@ -22,10 +22,10 @@ admin.site.register(Registration)
 #   "event_date": "2023-10-30",
 #   "event_time": "15:00:00",
 #   "event_venue": "Sample Venue",
-#   "event_budget": 0.0,
-#   "event_cost": 0.0,
+#   "event_budget": null,
+#   "event_cost": null,
 #   "event_regfee": 20.0,
 #   "event_image": null,
-#   "event_students": 0,
+#   "event_students": 1,
 #   "event_profit": 0.0
 # }
