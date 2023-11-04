@@ -132,3 +132,11 @@ class UpcomingEventsList(generics.ListAPIView):
             event_date=current_datetime.date(),
             event_time__lt=current_datetime.time()
         ).order_by('event_date', 'event_time')
+
+class ClubEventsList(generics.ListAPIView):
+    serializer_class = EventSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        club_id = self.kwargs['club_id']
+        return Event.objects.filter(event_club__club_id=club_id)
