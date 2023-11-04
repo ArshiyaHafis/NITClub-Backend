@@ -70,7 +70,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
 class ClubListCreateView(generics.ListCreateAPIView):
     queryset = Club.objects.all()
     serializer_class = ClubSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def perform_create(self, serializer):
         roll_number = self.request.data.get('club_admin')  
@@ -80,7 +80,7 @@ class ClubListCreateView(generics.ListCreateAPIView):
 class ClubDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Club.objects.all()
     serializer_class = ClubSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.AllowAny]
 
 class EventListCreateView(generics.ListCreateAPIView):
     queryset = Event.objects.all()
