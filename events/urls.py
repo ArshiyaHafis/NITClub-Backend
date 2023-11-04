@@ -16,3 +16,5 @@ urlpatterns = [
     path('upcoming-events/', UpcomingEventsList.as_view(), name='upcoming-events'),
     path('club/<str:club_id>/events/', ClubEventsList.as_view(), name='club_events'),
 ]
+
+
