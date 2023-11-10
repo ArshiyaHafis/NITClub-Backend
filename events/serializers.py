@@ -7,7 +7,8 @@ from .models import customuser, Club, Event, Registration
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = customuser
-        fields = ('roll_number', 'first_name', 'last_name', 'email', 'phone_number', 'isClubAdmin', 'date_joined', 'password')
+        fields = '__all__'
+        # fields = ('roll_number', 'first_name', 'last_name', 'email', 'phone_number', 'isClubAdmin', 'date_joined', 'password')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -47,6 +48,9 @@ class ClubSerializer(serializers.ModelSerializer):
         club_admin = validated_data.pop('club_admin')
         user = customuser.objects.get(roll_number=club_admin)
         user.isClubAdmin=True
+        # admin_position = validated_data.get('admin_position', '')
+        # print(admin_position)
+        # user.admin_position = admin_position
         user.save()
         validated_data['club_balance'] = validated_data['club_opening_balance']
         club = Club.objects.create(club_admin=user, **validated_data)
@@ -135,9 +139,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
             validated_data['reg_id'] = f'R{new_id_value:06}'
         else:
             validated_data['reg_id'] = 'R000001'
+
         registration = Registration(student_id=student, event_id=event, reg_id=validated_data['reg_id'])
         registration.save()
-
+        student.event_registration_count += 1
+        student.save()
         event.event_students = Registration.objects.filter(event_id=event).count()
         event.save()
 

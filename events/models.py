@@ -24,8 +24,9 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_club_admin(self, first_name, last_name, email, phone_number, roll_number, password, **extra_fields):
+    def create_club_admin(self, first_name, last_name, email, phone_number, roll_number, password, club_position, **extra_fields):
         extra_fields.setdefault('isClubAdmin', True)  
+        extra_fields.setdefault('club_position', club_position)
         return self.create_user(first_name, last_name, email, phone_number, roll_number, password, **extra_fields)
 
     def create_superuser(self, email, phone_number, roll_number, password=None, **extra_fields):
@@ -41,26 +42,33 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email=email, phone_number=phone_number, roll_number=roll_number, password=password, **extra_fields)
 
 class customuser(AbstractBaseUser, PermissionsMixin):
+    HOSTEL_CHOICES = [(hostel, hostel) for hostel in ['MBH1', 'MBH2', 'MLH', 'LH1', 'LH2', 'LH3', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'PG']]
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15)
     roll_number = models.CharField(max_length=15, primary_key=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
+    hostel_location = models.CharField(max_length=4, choices=HOSTEL_CHOICES)
+    event_registration_count = models.IntegerField(default=0) 
     date_joined = models.DateTimeField(default=datetime.today)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     isClubAdmin = models.BooleanField(default=False)  
+    admin_position = models.CharField(max_length=50, blank=True)
+
+
     
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'phone_number', 'roll_number']
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'phone_number', 'roll_number', 'hostel_location']
 
     def __str__(self):
         return self.roll_number
     
-    def update_admin(self):
-        self.isClubAdmin=True
+    def update_admin(self, admin_position=''):
+        self.isClubAdmin = True
+        self.admin_position = admin_position
         self.save()
 
     

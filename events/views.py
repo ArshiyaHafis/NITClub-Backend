@@ -36,6 +36,8 @@ class UserLoginView(APIView):
                 'roll_number': user.roll_number,
                 'is_active': user.is_active,
                 'isClubAdmin': user.isClubAdmin, 
+                'hostel_location': user.hostel_location,
+                'event_registration_count': user.event_registration_count,
             }
 
             return Response({'token': token.key, 'user': user_data})
@@ -66,15 +68,20 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
             
             return super().retrieve(request, *args, **kwargs)
 
-
 class ClubListCreateView(generics.ListCreateAPIView):
     queryset = Club.objects.all()
     serializer_class = ClubSerializer
     permission_classes = [permissions.AllowAny]
 
     def perform_create(self, serializer):
-        roll_number = self.request.data.get('club_admin')  
-        serializer.save(club_admin=roll_number)  
+        roll_number = self.request.data.get('club_admin') 
+        admin_position = self.request.data.get('admin_position')
+        user = customuser.objects.get(roll_number=roll_number)
+        # print(admin_position)
+        user.admin_position = admin_position
+        user.save() 
+        serializer.save(club_admin=roll_number)
+
 
 
 class ClubDetailView(generics.RetrieveUpdateDestroyAPIView):
