@@ -88,7 +88,9 @@ class EventSerializer(serializers.ModelSerializer):
                 
         event_budget = validated_data.get('event_budget', 0)
         event_cost = validated_data.get('event_cost', 0)
-        validated_data['event_profit'] = event_budget - event_cost
+        event_students = validated_data.get('event_students', 0)
+        event_regfee = validated_data.get('event_regfee', 0)
+        validated_data['event_profit'] = event_budget - event_cost + (event_students*event_regfee)
 
         event = Event.objects.create(event_club=club, **validated_data)
         self.update_club_balance(club)
@@ -102,7 +104,9 @@ class EventSerializer(serializers.ModelSerializer):
 
         event_budget = validated_data.get('event_budget', instance.event_budget)
         event_cost = validated_data.get('event_cost', instance.event_cost)
-        instance.event_profit = event_budget - event_cost
+        event_students = validated_data.get('event_students', instance.event_students)
+        event_regfee = validated_data.get('event_regfee', instance.event_regfee)
+        instance.event_profit = event_budget - event_cost + (event_students * event_regfee)
 
         instance.save()
         self.update_club_balance(instance.event_club)
@@ -110,10 +114,9 @@ class EventSerializer(serializers.ModelSerializer):
         return instance
 
     def update_club_balance(self, club):
-        total_event_budget = Event.objects.filter(event_club=club).aggregate(total_budget=Sum('event_budget'))['total_budget'] or 0
-        total_event_cost = Event.objects.filter(event_club=club).aggregate(total_profit=Sum('event_cost'))['total_profit'] or 0
-        print(total_event_budget, total_event_cost)
-        club.club_balance = club.club_opening_balance - total_event_budget + total_event_cost
+        total_event_profit = Event.objects.filter(event_club=club).aggregate(total_budget=Sum('event_profit'))['total_budget'] or 0
+        print(total_event_profit)
+        club.club_balance = club.club_opening_balance + total_event_profit
         print(club.club_balance)
         club.save()
 

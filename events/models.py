@@ -94,7 +94,7 @@ class Event(models.Model):
     event_cost = models.FloatField(null=True, default=0)
     event_regfee = models.FloatField()
     event_club = models.ForeignKey('Club', on_delete=models.CASCADE)
-    event_image = models.ImageField(upload_to='images/event_images/', blank=True)
+    event_image = models.ImageField(upload_to='images/event_images/', blank=True, null = True)
     event_students = models.IntegerField(default=0)
     event_profit = models.FloatField(default=0)
 
